@@ -88,6 +88,7 @@ function askGpt($userMessage)
 
     curl_close($ch);
 
+
     $result = json_decode($response, true);
 
     if (isset($result['error'])) {
