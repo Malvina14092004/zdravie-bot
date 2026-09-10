@@ -1,13 +1,11 @@
 <?php
-$botToken = '8120386075:AAGPWp4_4fOj3RmcZ4uYPdOnx_WTczNYS2g';
-$openRouterKey = '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';
-// Пример модели: openai/gpt-3.5-turbo-16k или любая другая
+$botToken = getenv('BOT_TOKEN');
+$openRouterKey = getenv('OPENROUTER_KEY');
 $model = 'openai/gpt-3.5-turbo-16k';
 
 // =============== ПОЛУЧАЕМ ВХОДЯЩИЙ ЗАПРОС ==============
 
 $input = file_get_contents('php://input');
-file_put_contents('log.txt', $input . PHP_EOL, FILE_APPEND); // лог в файл
 
 $update = json_decode($input, true);
 
@@ -21,7 +19,6 @@ $text = $update['message']['text'] ?? '';
 if ($text === '/start') {
     $reply = "Привет! Я бот «Здоровье под рукой» 🩺\n\nЯ могу ответить на любые твои вопросы о здоровье (справочного характера). Спрашивай!";
 } else {
-    // отправляем запрос к OpenRouter (или OpenAI напрямую)
     $reply = askGpt($text);
 }
 
@@ -67,9 +64,9 @@ function askGpt($userMessage)
             [
                 'role' => 'user',
                 'content' => $userMessage
-            ],
-            'temperature' => 0.7
-        ]
+            ]
+        ],
+        'temperature' => 0.7
     ]);
 
     $ch = curl_init($url);
@@ -88,7 +85,6 @@ function askGpt($userMessage)
 
     curl_close($ch);
 
-
     $result = json_decode($response, true);
 
     if (isset($result['error'])) {
@@ -97,6 +93,3 @@ function askGpt($userMessage)
 
     return $result['choices'][0]['message']['content'] ?? 'Извините, не получилось получить ответ 😔';
 }
-
-
-?>
